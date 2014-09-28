@@ -20,13 +20,14 @@ class SwitchManager(object):
     def _activate(self):
         print 'activate'
         self._active = True
-        self._keyboard.press_key(self._keyboard.alt_key)
-        self._keyboard.tap_key(self._keyboard.tab_key)
+        self._keyboard.press_key(self._keyboard.super_l_key)
+        self._keyboard.tap_key('w')
+        self._keyboard.release_key(self._keyboard.super_l_key)
 
     def _deactivate(self):
         print 'deactivate'
         self._active = False
-        self._keyboard.release_key(self._keyboard.alt_key)
+        self._keyboard.tap_key(self._keyboard.enter_key)
 
     def toggle(self):
         if self._last_toggle + TOGGLE_INTERVAL > time.time():
