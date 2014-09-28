@@ -27,14 +27,14 @@ You can configure thresholds and switching window strategy:
 
 .. code-block:: bash
 
-    $ leaptab -- help
+    $ leaptab --help
 
     usage: leaptab [-h] [--use-alt-tab] [--swipe-threshold SWIPE_THRESHOLD]
                    [--toggle-interval TOGGLE_INTERVAL]
 
     optional arguments:
       -h, --help            show this help message and exit
-      --use-alt-tab         Use alt+tab for switching windows.By default win+w
+      --use-alt-tab         Use alt+tab for switching windows. By default win+w
                             used.
       --swipe-threshold SWIPE_THRESHOLD
                             Threshold for swipe gestures.
