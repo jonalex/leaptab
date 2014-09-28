@@ -8,24 +8,52 @@ from pykeyboard import PyKeyboard
 import Leap
 
 
+class WinWStrategy(object):
+    """Strategy where window switchers opens with win+w."""
+
+    def __init__(self, keyboard):
+        self._keyboard = keyboard
+
+    def open(self):
+        self._keyboard.press_key(self._keyboard.super_l_key)
+        self._keyboard.tap_key('w')
+        self._keyboard.release_key(self._keyboard.super_l_key)
+
+    def close(self):
+        self._keyboard.tap_key(self._keyboard.enter_key)
+
+
+class AltTabStrategy(object):
+    """Strategy where window switcher opens with alt+tab."""
+
+    def __init__(self, keyboard):
+        self._keyboard = keyboard
+
+    def open(self):
+        self._keyboard.press_key(self._keyboard.alt_key)
+        self._keyboard.tap_key(self._keyboard.tab_key)
+
+    def close(self):
+        self._keyboard.release_key(self._keyboard.alt_key)
+
+
 class SwitchManager(object):
-    def __init__(self, toggle_interval):
+    def __init__(self, toggle_interval, strategy):
         self._toggle_interval = toggle_interval
-        self._active = False
         self._keyboard = PyKeyboard()
+        self._strategy = strategy(self._keyboard)
+        self._active = False
         self._last_toggle = time.time()
 
     def _activate(self):
         print 'activate'
         self._active = True
-        self._keyboard.press_key(self._keyboard.super_l_key)
-        self._keyboard.tap_key('w')
-        self._keyboard.release_key(self._keyboard.super_l_key)
+        self._strategy.open()
 
     def _deactivate(self):
         print 'deactivate'
         self._active = False
-        self._keyboard.tap_key(self._keyboard.enter_key)
+        self._strategy.close()
 
     def toggle(self):
         if self._last_toggle + self._toggle_interval > time.time():
@@ -103,6 +131,9 @@ class Listener(Leap.Listener):
 
 def get_args():
     parser = ArgumentParser()
+    parser.add_argument('--use-alt-tab', action='store_true',
+                        help='Use alt+tab for switching windows.'
+                             'By default win+w used.')
     parser.add_argument('--swipe-threshold', type=float, default=0.1,
                         help='Threshold for swipe gestures.')
     parser.add_argument('--toggle-interval', type=int, default=3,
@@ -113,7 +144,9 @@ def get_args():
 
 def main():
     args = get_args()
-    manager = SwitchManager(args.toggle_interval)
+    manager = SwitchManager(
+        args.toggle_interval,
+        AltTabStrategy if args.use_alt_tab else WinWStrategy)
     listener = Listener(manager, args.swipe_threshold)
     controller = Leap.Controller()
     controller.add_listener(listener)
