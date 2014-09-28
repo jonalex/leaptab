@@ -19,11 +19,13 @@ Usage
 You can run leaptab with:
 
 .. code-block:: bash
+
     leaptab
 
 You can configure thresholds and switching window strategy:
 
 .. code-block:: bash
+
     $ leaptab -- help
 
     usage: leaptab [-h] [--use-alt-tab] [--swipe-threshold SWIPE_THRESHOLD]
