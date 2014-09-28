@@ -104,12 +104,12 @@ class Listener(Leap.Listener):
         handled = []
         for gesture in controller.frame().gestures():
             if gesture.type == Leap.Gesture.TYPE_CIRCLE and \
-                            gesture.state == Leap.Gesture.STATE_STOP:
+                    gesture.state == Leap.Gesture.STATE_STOP:
                 if not 'circle' in handled:
                     handled.append('circle')
                     self._switch_manger.toggle()
             elif gesture.type == Leap.Gesture.TYPE_SWIPE and \
-                            gesture.state == Leap.Gesture.STATE_STOP:
+                    gesture.state == Leap.Gesture.STATE_STOP:
                 swipe = Leap.SwipeGesture(gesture)
                 if swipe.direction.x > self._swipe_threshold and \
                         not 'x' in handled:
