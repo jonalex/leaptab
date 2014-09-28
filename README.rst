@@ -11,6 +11,7 @@ Installation
 3. Install `lepatab` with:
 
 .. code-block:: bash
+
     python setup.py develop
 
 Usage
