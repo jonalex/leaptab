@@ -86,20 +86,20 @@ class Listener(Leap.Listener):
                     gesture.state == Leap.Gesture.STATE_STOP:
                 swipe = Leap.SwipeGesture(gesture)
                 if swipe.direction.x > GESTURE_THRESHOLD and\
-                        not 'right' in handled:
-                    handled.append('right')
+                        not 'x' in handled:
+                    handled.append('x')
                     self._switch_manger.right()
                 if swipe.direction.x < GESTURE_THRESHOLD and\
-                        not 'left' in handled:
-                    handled.append('left')
+                        not 'x' in handled:
+                    handled.append('x')
                     self._switch_manger.left()
                 if swipe.direction.y > GESTURE_THRESHOLD and\
-                        not 'up' in handled:
-                    handled.append('up')
+                        not 'y' in handled:
+                    handled.append('y')
                     self._switch_manger.up()
                 if swipe.direction.y < GESTURE_THRESHOLD and\
-                        not 'down' in handled:
-                    handled.append('down')
+                        not 'y' in handled:
+                    handled.append('y')
                     self._switch_manger.down()
 
 
