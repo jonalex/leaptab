@@ -12,6 +12,9 @@ class WinWStrategy(object):
     """Strategy where window switchers opens with win+w."""
 
     def __init__(self, keyboard):
+        """
+        :type keyboard: PyKeyboard
+        """
         self._keyboard = keyboard
 
     def open(self):
@@ -27,6 +30,9 @@ class AltTabStrategy(object):
     """Strategy where window switcher opens with alt+tab."""
 
     def __init__(self, keyboard):
+        """
+        :type keyboard: PyKeyboard
+        """
         self._keyboard = keyboard
 
     def open(self):
@@ -105,33 +111,37 @@ class Listener(Leap.Listener):
             handled.append('circle')
             self._switch_manger.toggle()
 
+    def _on_swipe(self, swipe, handled, axis, direction, check_threshold):
+        """
+        :type swipe: Leap.SwipeGesture
+        :type handled: list[str]
+        :type direction: str
+        :type check_threshold: (float) -> bool
+        """
+        value = getattr(swipe.direction, axis)
+        if check_threshold(value) and not axis in handled:
+            handled.append(axis)
+            getattr(self._switch_manger, direction)()
+
     def _on_swipe_x(self, swipe, handled):
         """
         :type swipe: Leap.SwipeGesture
         :type handled: list[str]
         """
-        if swipe.direction.x > self._swipe_threshold and \
-                not 'x' in handled:
-            handled.append('x')
-            self._switch_manger.right()
-        if swipe.direction.x < -self._swipe_threshold and \
-                not 'x' in handled:
-            handled.append('x')
-            self._switch_manger.left()
+        self._on_swipe(swipe, handled, 'x', 'right',
+                       lambda x: x > self._swipe_threshold)
+        self._on_swipe(swipe, handled, 'x', 'left',
+                       lambda x: x < -self._swipe_threshold)
 
     def _on_swipe_y(self, swipe, handled):
         """
         :type swipe: Leap.SwipeGesture
         :type handled: list[str]
         """
-        if swipe.direction.y > self._swipe_threshold and \
-                not 'y' in handled:
-            handled.append('y')
-            self._switch_manger.up()
-        if swipe.direction.y < -self._swipe_threshold and \
-                not 'y' in handled:
-            handled.append('y')
-            self._switch_manger.down()
+        self._on_swipe(swipe, handled, 'y', 'up',
+                       lambda y: y > self._swipe_threshold)
+        self._on_swipe(swipe, handled, 'y', 'down',
+                       lambda y: y < -self._swipe_threshold)
 
     def on_frame(self, controller):
         """
