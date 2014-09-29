@@ -97,6 +97,42 @@ class Listener(Leap.Listener):
         controller.enable_gesture(Leap.Gesture.TYPE_SWIPE)
         controller.config.save()
 
+    def _on_circle_gesture(self, handled):
+        """
+        :type handled: list[str]
+        """
+        if not 'circle' in handled:
+            handled.append('circle')
+            self._switch_manger.toggle()
+
+    def _on_swipe_x(self, swipe, handled):
+        """
+        :type swipe: Leap.SwipeGesture
+        :type handled: list[str]
+        """
+        if swipe.direction.x > self._swipe_threshold and \
+                not 'x' in handled:
+            handled.append('x')
+            self._switch_manger.right()
+        if swipe.direction.x < -self._swipe_threshold and \
+                not 'x' in handled:
+            handled.append('x')
+            self._switch_manger.left()
+
+    def _on_swipe_y(self, swipe, handled):
+        """
+        :type swipe: Leap.SwipeGesture
+        :type handled: list[str]
+        """
+        if swipe.direction.y > self._swipe_threshold and \
+                not 'y' in handled:
+            handled.append('y')
+            self._switch_manger.up()
+        if swipe.direction.y < -self._swipe_threshold and \
+                not 'y' in handled:
+            handled.append('y')
+            self._switch_manger.down()
+
     def on_frame(self, controller):
         """
         :type controller: Leap.Controller
@@ -105,28 +141,12 @@ class Listener(Leap.Listener):
         for gesture in controller.frame().gestures():
             if gesture.type == Leap.Gesture.TYPE_CIRCLE and \
                     gesture.state == Leap.Gesture.STATE_STOP:
-                if not 'circle' in handled:
-                    handled.append('circle')
-                    self._switch_manger.toggle()
+                self._on_circle_gesture(handled)
             elif gesture.type == Leap.Gesture.TYPE_SWIPE and \
                     gesture.state == Leap.Gesture.STATE_STOP:
                 swipe = Leap.SwipeGesture(gesture)
-                if swipe.direction.x > self._swipe_threshold and \
-                        not 'x' in handled:
-                    handled.append('x')
-                    self._switch_manger.right()
-                if swipe.direction.x < self._swipe_threshold and \
-                        not 'x' in handled:
-                    handled.append('x')
-                    self._switch_manger.left()
-                if swipe.direction.y > self._swipe_threshold and \
-                        not 'y' in handled:
-                    handled.append('y')
-                    self._switch_manger.up()
-                if swipe.direction.y < self._swipe_threshold and \
-                        not 'y' in handled:
-                    handled.append('y')
-                    self._switch_manger.down()
+                self._on_swipe_x(swipe, handled)
+                self._on_swipe_y(swipe, handled)
 
 
 def get_args():
