@@ -4,6 +4,7 @@ sys.path.insert(0, '../leap')
 
 import time
 from argparse import ArgumentParser
+from contextlib import contextmanager
 from pykeyboard import PyKeyboard
 import Leap
 
@@ -111,37 +112,25 @@ class Listener(Leap.Listener):
             handled.append('circle')
             self._switch_manger.toggle()
 
-    def _on_swipe(self, swipe, handled, axis, direction, check_threshold):
+    def _on_swipe(self, axis, direction, check_threshold):
         """
-        :type swipe: Leap.SwipeGesture
-        :type handled: list[str]
         :type direction: str
         :type check_threshold: (float) -> bool
         """
-        value = getattr(swipe.direction, axis)
-        if check_threshold(value) and not axis in handled:
-            handled.append(axis)
+        value = getattr(self._swipe.direction, axis)
+        if check_threshold(value) and not axis in self._handled:
+            self._handled.append(axis)
             getattr(self._switch_manger, direction)()
 
-    def _on_swipe_x(self, swipe, handled):
+    @contextmanager
+    def _swipe_gesture(self, swipe, handled):
         """
-        :type swipe: Leap.SwipeGesture
+        :type swipe: Leap.Gesture
         :type handled: list[str]
         """
-        self._on_swipe(swipe, handled, 'x', 'right',
-                       lambda x: x > self._swipe_threshold)
-        self._on_swipe(swipe, handled, 'x', 'left',
-                       lambda x: x < -self._swipe_threshold)
-
-    def _on_swipe_y(self, swipe, handled):
-        """
-        :type swipe: Leap.SwipeGesture
-        :type handled: list[str]
-        """
-        self._on_swipe(swipe, handled, 'y', 'up',
-                       lambda y: y > self._swipe_threshold)
-        self._on_swipe(swipe, handled, 'y', 'down',
-                       lambda y: y < -self._swipe_threshold)
+        self._swipe = Leap.SwipeGesture(swipe)
+        self._handled = handled
+        yield
 
     def on_frame(self, controller):
         """
@@ -154,9 +143,15 @@ class Listener(Leap.Listener):
                 self._on_circle_gesture(handled)
             elif gesture.type == Leap.Gesture.TYPE_SWIPE and \
                     gesture.state == Leap.Gesture.STATE_STOP:
-                swipe = Leap.SwipeGesture(gesture)
-                self._on_swipe_x(swipe, handled)
-                self._on_swipe_y(swipe, handled)
+                with self._swipe_gesture(gesture, handled):
+                    self._on_swipe('x', 'right',
+                                   lambda x: x > self._swipe_threshold)
+                    self._on_swipe('x', 'left',
+                                   lambda x: x < -self._swipe_threshold)
+                    self._on_swipe('y', 'up',
+                                   lambda y: y > self._swipe_threshold)
+                    self._on_swipe('y', 'down',
+                                   lambda y: y < -self._swipe_threshold)
 
 
 def get_args():
