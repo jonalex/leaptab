@@ -1,13 +1,13 @@
 LeapTab
 =========
 
-Tool for switching windows with leapmotion.
+Tool for switching windows with leap motion.
 
 Installation
 -------------
 
 1. Clone repository.
-2. Move leapmotion libraries in leap folder (`Leap.py`, `libLeap.so` and `LeapPython.so`).
+2. Move leap motion libraries in leap folder (`Leap.py`, `libLeap.so` and `LeapPython.so`).
 3. Install `lepatab` with:
 
 .. code-block:: bash
